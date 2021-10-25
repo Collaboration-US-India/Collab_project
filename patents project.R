@@ -86,6 +86,27 @@ patents_types = patents %>% group_by(ee_country,ptype) %>% summarize(count = n()
 head(patents_types)
 View(patents_types)
 
+## Additional coding for variables used in upcoming code
+
+patents_by_country <- patents %>%
+  group_by(ee_country) %>%
+  summarize(count = n())
+
+head(patents_by_country)
+
+# US Subset
+patents_us <- subset(patents, ee_country == "US")
+
+nrow(patents_us)
+
+# US Approval Time
+patents_us$time_to_approval <- patents_us$grantyear - 
+  patents_us$applyear
+
+aggregate(time_to_approval ~ ee_state,
+          data = patents_us, 
+          FUN = mean)
+
 # Count of patents by type per city in US
 patents_us_count <- patents_us %>% group_by(ee_city,ptype) %>% summarize(count = n())
 head(patents_us_count)
@@ -106,3 +127,16 @@ top5_types <- patent_types_5[1:5,]
 
 # Top 5 countries are utility patents of US, Japan, Korea, Germany, and the design patents of US
 
+# Graphing patents by US cities
+ggplot(top10_patents, aes(x = reorder(ee_city, -count), y = count)) + 
+  geom_bar(stat = "Identity") +
+  labs(x = 'City', y = '# of Utility Patents', color = NULL) +
+  theme_classic() +
+  guides(linetype = FALSE)
+
+# Graphing patents across countries
+ggplot(top5_types, aes(x = reorder(ee_country, -count), y = count)) + 
+  geom_bar(stat = "Identity") +
+  labs(x = 'Country', y = '# of Patents', color = NULL) +
+  theme_classic() +
+  guides(linetype = FALSE)
