@@ -140,3 +140,94 @@ ggplot(top5_types, aes(x = reorder(ee_country, -count), y = count)) +
   labs(x = 'Country', y = '# of Patents', color = NULL) +
   theme_classic() +
   guides(linetype = FALSE)
+
+##Herman Singh: Project Problem 1
+
+patents <- read.csv("patents_10.csv", header = TRUE)
+
+head(patents)
+
+library(dplyr)
+
+patents_by_country <- patents %>%
+  group_by(ee_country) %>%
+  summarize(count = n())
+
+head(patents_by_country)
+
+#Will be looking at data from the 3 countries where group members are located
+
+#US Subset
+patents_us <- subset(patents, ee_country == "US")
+
+nrow(patents_us)
+
+#Approval Time in the US by State
+patents_us$time_to_approval <- patents_us$grantyear - 
+  patents_us$applyear
+
+aggregate(time_to_approval ~ ee_state,
+          data = patents_us, 
+          FUN = mean)
+
+#Count of Patents by City in the US
+patents_us_count <- patents_us %>% group_by(ee_city) %>% summarize(count = n())
+
+head(patents_us_count)
+
+#20 Cities With Most Patents in the US
+patents_us_20 <- patents_us_count[with(patents_us_count, order(-count)),]
+
+top_20_citypatents_us <- patents_us_20[1:20,]
+
+top_20_citypatents_us
+
+#it is interesting to note that 8 of the top 20 are located in California
+#Another fun fact is that half of the top 20 consists of cities from the
+#2 states I have lived in
+
+#india subset
+patents_in <- subset(patents, ee_country == "IN")
+
+nrow(patents_in)
+
+#Count of Patents by City in India
+patents_in_count <- patents_in %>% group_by(ee_city) %>% summarize(count = n())
+
+head(patents_in_count)
+
+#20 Cities With Most Patents in India
+patents_in_20 <- patents_in_count[with(patents_in_count, order(-count)),]
+
+top_20_citypatents_in <- patents_in_20[1:20,]
+
+top_20_citypatents_in
+
+#Unsurprisingly Mumbai, Bangalore, and New Delhi are the highest ranking cities 
+#for patents in india. Additionally, they also show up with other cities further
+#down the list.
+
+#germany subset
+patents_de <- subset(patents, ee_country == "DE")
+
+nrow(patents_de)
+
+#Count of Patents by City in Germany
+patents_de_count <- patents_de %>% group_by(ee_city) %>% summarize(count = n())
+
+head(patents_de_count)
+
+#20 Cities with most patents in Germany
+patents_de_20 <- patents_de_count[with(patents_de_count, order(-count)),]
+
+top_20_citypatents_de <- patents_de_20[1:20,]
+
+top_20_citypatents_de
+
+#Munich and Stuttgart top the list in Germany, which is no surprise given that
+#they are considered innovation centers in the country
+
+#Looking at these countries together, it is apparent that the numbers in the US
+#far exceeds those of Germany and India. Something of note is that the city in 
+#20th place for the US, Seattle, would find itself in 3rd place if it were in 
+#Germany, and in 1st place by a very large margin if it were in India
